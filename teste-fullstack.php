@@ -5,11 +5,23 @@
 * Author URI: https://github.com/alexvickers
 */
 
+define ('HOURS', 60 * 60);
+
 function loteria_plugin() {
 
-    $fetch_api = wp_remote_get('https://loteriascaixa-api.herokuapp.com/api');
+    global $apiInfo;
+    if(empty($apiInfo)) $apiInfo = get_transient('apiInfo');
+    if(!empty($apiInfo)) return $apiInfo;
 
-    var_dump($fetch_api);
+    $response = wp_remote_get('https://loteriascaixa-api.herokuapp.com/api');
+    $data = wp_remote_retrieve_body($response);
+
+    if(empty($data)) return false;
+
+    $apiInfo = json_decode(($data));
+    set_transient('api_info', $apiInfo, 12 * HOURS);
+
+    var_dump($apiInfo);
 
 }
 
